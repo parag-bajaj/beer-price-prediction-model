@@ -37,15 +37,15 @@ def query_generation():
     current_timestamp_start = start.strftime('%Y-%m-%d %H:%M:%S.%f')[:-3]
 
     beer_data = request.get_json()
+    if not beer_data.get('BaseSellingPrice', None) or beer_data.get('BaseSellingPrice', None) < 0:
+        answer=json.dumps({"error":"Base Selling Price is missing"})
+        return flask.Response(response=answer, status=403, mimetype='application/json')
 
 
     
     try:
         
-       
-        df = pd.DataFrame([beer_data])
-        print(df)
-        predicted_price=calculate_dynamic_beer_price(df)
+        predicted_price=calculate_dynamic_beer_price(beer_data)
         schema=f""" You are a FAQ chatbot which takes base selling price and predicted price of a beer based on several factors provided in context.
         Use the context provided {beer_data}, the predicted price is {predicted_price} .
         1. You need to provide the reasoning of % price change in base price and predicted price on factors mentioned above.
