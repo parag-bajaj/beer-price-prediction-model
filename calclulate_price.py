@@ -4,6 +4,7 @@ from datetime import datetime
 def calculate_dynamic_beer_price(input_json, min_adjustment=-0.15, max_adjustment=0.40, noise_level=0.02):
     """
     Calculates dynamic beer price based on behavioral and situational factors.
+    Case-insensitive matching for all string inputs.
     
     Args:
         input_json (dict): JSON containing pricing factors
@@ -16,97 +17,100 @@ def calculate_dynamic_beer_price(input_json, min_adjustment=-0.15, max_adjustmen
     """
     # Default values for all possible inputs
     defaults = {
-        'UserHistory': 'Occasional',
+        'UserHistory': 'occasional',
         'AgeGroup': '45-54',
-        'DeviceType': 'Desktop',
-        'OSType': 'Windows',
-        'ScreenSize': 'Medium',
-        'CompetitorPricing': 'Similar',
-        'RegionalDemand': 'Medium',
-        'CustomerRating': 'Medium',
-        'PaydayProximity': 'Far',
-        'TourismLevel': 'Medium',
-        'ProductMarketingStatus': 'Medium',
-        'DayOfWeek': 'Wednesday',
-        'DemandIndex': 'Medium',
-        'SpecialOccasion': 'None',
+        'DeviceType': 'desktop',
+        'OSType': 'windows',
+        'ScreenSize': 'medium',
+        'CompetitorPricing': 'similar',
+        'RegionalDemand': 'medium',
+        'CustomerRating': 'medium',
+        'PaydayProximity': 'far',
+        'TourismLevel': 'medium',
+        'ProductMarketingStatus': 'medium',
+        'DayOfWeek': 'wednesday',
+        'DemandIndex': 'medium',
+        'SpecialOccasion': 'none',
         'Temperature': 20,
-        'WeatherCondition': 'Clear',
-        'InventoryLevel': 'Medium',
-        'CityType': 'Suburban',
-        'WeekdayType': 'Weekday',
-        'DayType': 'Regular'
+        'WeatherCondition': 'clear',
+        'InventoryLevel': 'medium',
+        'CityType': 'suburban',
+        'WeekdayType': 'weekday',
+        'DayType': 'regular'
     }
     
-    # Merge input JSON with defaults
-    data = {**defaults, **input_json}
+    # Convert input values to lowercase
+    input_json_lower = {k: v.lower() if isinstance(v, str) else v for k, v in input_json.items()}
     
-    # Behavioral Markups
+    # Merge input JSON with defaults
+    data = {**defaults, **input_json_lower}
+    
+    # Behavioral Markups (all keys in lowercase)
     user_history_markup = {
-        'New': 0.98, 'Frequent': 1.02, 'Premium': 1.03, 'VIP': 1.04, 
-        'Occasional': 1.00, 'Lapsed': 0.97
+        'new': 0.98, 'frequent': 1.02, 'premium': 1.03, 'vip': 1.04, 
+        'occasional': 1.00, 'lapsed': 0.97
     }
     age_group_markup = {
         '18-24': 1.02, '25-34': 1.03, '35-44': 1.02, '45-54': 1.0, '55+': 0.99
     }
     device_type_markup = {
-        'Mobile': 1.02, 'Desktop': 1.00, 'Tablet': 1.01, 'Smart TV': 1.00
+        'mobile': 1.02, 'desktop': 1.00, 'tablet': 1.01, 'smart tv': 1.00
     }
     os_type_markup = {
-        'iOS': 1.03, 'Android': 1.02, 'Windows': 1.00, 'MacOS': 1.01
+        'ios': 1.03, 'android': 1.02, 'windows': 1.00, 'macos': 1.01
     }
     screen_size_markup = {
-        'Small': 0.98, 'Medium': 1.00, 'Large': 1.02
+        'small': 0.98, 'medium': 1.00, 'large': 1.02
     }
     competitor_pricing_markup = {
-        'Lower': 0.98, 'Similar': 1.00, 'Higher': 1.02
+        'lower': 0.98, 'similar': 1.00, 'higher': 1.02
     }
     regional_demand_markup = {
-        'Low': 0.98, 'Medium': 1.00, 'High': 1.04
+        'low': 0.98, 'medium': 1.00, 'high': 1.04
     }
     customer_rating_markup = {
-        'Low': 0.97, 'Medium': 1.00, 'High': 1.03
+        'low': 0.97, 'medium': 1.00, 'high': 1.03
     }
     payday_proximity_markup = {
-        'Far': 1.0, 'Near': 1.02
+        'far': 1.0, 'near': 1.02
     }
     tourism_level_markup = {
-        'Low': 0.98, 'Medium': 1.0, 'High': 1.04
+        'low': 0.98, 'medium': 1.0, 'high': 1.04
     }
     product_marketing_status_markup = {
-        'Low': 0.98, 'Medium': 1.0, 'High': 1.03
+        'low': 0.98, 'medium': 1.0, 'high': 1.03
     }
     
     def get_time_day_markup(hour, day):
         time_markup = 0.98 if hour < 12 else (1.00 if hour < 16 else 1.02)
         day_markup = {
-            'Monday': 0.98, 'Tuesday': 0.99, 'Wednesday': 1.00, 
-            'Thursday': 1.01, 'Friday': 1.04, 'Saturday': 1.05, 'Sunday': 1.02
+            'monday': 0.98, 'tuesday': 0.99, 'wednesday': 1.00, 
+            'thursday': 1.01, 'friday': 1.04, 'saturday': 1.05, 'sunday': 1.02
         }
         happy_hour_factor = 0.98 if 16 <= hour < 19 else 1.00
         return time_markup * day_markup.get(day, 1.00) * happy_hour_factor
 
     demand_markup = {
-        'Very Low': 0.95, 'Low': 0.97, 'Medium': 1.00, 
-        'High': 1.02, 'Very High': 1.04
+        'very low': 0.95, 'low': 0.97, 'medium': 1.00, 
+        'high': 1.02, 'very high': 1.04
     }
     event_markup = {
-        'None': 1.00, 'Sports Event': 1.05, 'Festival': 1.04, 
-        'Holiday': 1.04, 'Concert': 1.06
+        'none': 1.00, 'sports event': 1.05, 'festival': 1.04, 
+        'holiday': 1.04, 'concert': 1.06
     }
     
     def get_weather_markup(temp, condition):
         temp_factor = 1 + (temp - 20) * 0.005
         weather_factors = {
-            'Sunny': 1.02, 'Rainy': 0.98, 'Cloudy': 0.99, 
-            'Snow': 1.02, 'Clear': 1.0
+            'sunny': 1.02, 'rainy': 0.98, 'cloudy': 0.99, 
+            'snow': 1.02, 'clear': 1.0
         }
         return temp_factor * weather_factors.get(condition, 1.00)
 
-    inventory_level_markup = {'Low': 1.04, 'Medium': 1.0, 'High': 0.98}
-    city_type_markup = {'Urban': 1.03, 'Suburban': 1.0, 'Rural': 0.98}
-    weekday_type_markup = {'Weekday': 1.00, 'Weekend': 1.03}
-    day_type_markup = {'Regular': 1.00, 'Holiday': 1.03}
+    inventory_level_markup = {'low': 1.04, 'medium': 1.0, 'high': 0.98}
+    city_type_markup = {'urban': 1.03, 'suburban': 1.0, 'rural': 0.98}
+    weekday_type_markup = {'weekday': 1.00, 'weekend': 1.03}
+    day_type_markup = {'regular': 1.00, 'holiday': 1.03}
 
     # Calculate base price with all markups
     base_selling_price = data['BaseSellingPrice']
@@ -134,7 +138,6 @@ def calculate_dynamic_beer_price(input_json, min_adjustment=-0.15, max_adjustmen
     base_price *= city_type_markup.get(data['CityType'], 1.0)
     base_price *= weekday_type_markup.get(data['WeekdayType'], 1.0)
     base_price *= day_type_markup.get(data['DayType'], 1.0)
-    
     
     # Clip price to min/max range
     final_price = np.clip(base_price, min_price, max_price)
