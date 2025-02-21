@@ -29,6 +29,10 @@ app = Flask(__name__)
 def ping():
     return flask.Response(response='Successful Ping')
 
+@app.after_request
+def add_headers(response):
+    response.headers['Access-Control-Allow-Origin'] = '*'  # Adjust as needed
+    return response
  
 
 @app.route('/invocations', methods=['POST'])
