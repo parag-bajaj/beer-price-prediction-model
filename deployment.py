@@ -14,9 +14,9 @@ import google.generativeai as genai
 
 key=os.getenv('GEMINI_KEY')
 genai.configure(api_key=key)
-for m in genai.list_models():
-    if 'generateContent' in m.supported_generation_methods:
-        print(m.name)
+# for m in genai.list_models():
+#     if 'generateContent' in m.supported_generation_methods:
+#         print(m.name)
 
 
 ########## FLASK CODE BEGINS ##########
@@ -59,6 +59,7 @@ def query_generation():
         response=model.generate_content(schema)
     
         reasoning=response.text
+        print(reasoning)
         answer=json.dumps({"predicted_price":float(predicted_price),"reasoning":reasoning})
     except Exception as e:
         errors = {'Errors':e}
