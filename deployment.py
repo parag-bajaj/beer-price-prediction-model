@@ -12,8 +12,8 @@ import numpy as np
 from calclulate_price import calculate_dynamic_beer_price
 import google.generativeai as genai
 
-
-genai.configure(api_key='')
+key=os.getenv('GEMINI_KEY')
+genai.configure(api_key=key)
 for m in genai.list_models():
     if 'generateContent' in m.supported_generation_methods:
         print(m.name)
