@@ -32,6 +32,8 @@ def ping():
 @app.after_request
 def add_headers(response):
     response.headers['Access-Control-Allow-Origin'] = '*'  # Adjust as needed
+    response.headers['Access-Control-Allow-Headers'] = 'Content-Type, Authorization'
+    response.headers['Access-Control-Allow-Methods'] = 'GET, POST, OPTIONS'
     return response
  
 
@@ -71,7 +73,7 @@ def query_generation():
         answer="Error"
     
     
-    return flask.Response(response=answer, status=200, mimetype='application/json',headers={'Access-Control-Allow-Origin': '*'})
+    return flask.Response(response=answer, status=200, mimetype='application/json',headers={'Access-Control-Allow-Origin': '*','Access-Control-Allow-Headers':'Content-Type, Authorization','Access-Control-Allow-Methods':'GET, POST, OPTIONS'})
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port = 8080, threaded = True)
