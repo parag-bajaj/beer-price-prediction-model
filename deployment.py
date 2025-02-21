@@ -71,7 +71,7 @@ def query_generation():
         answer="Error"
     
     
-    return flask.Response(response=answer, status=200, mimetype='application/json')
+    return flask.Response(response=answer, status=200, mimetype='application/json',headers={'Access-Control-Allow-Origin': '*'})
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port = 8080, threaded = True)
